@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS S3 Static Website</title>
+  <meta name="description" content="Modern responsive website ready for AWS S3 deployment" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0f172a;
+      color: #ffffff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+    }
+
+    .container {
+      width: min(1200px, 90%);
+      margin: auto;
+    }
+
+    header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #38bdf8;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding-top: 90px;
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      align-items: center;
+      gap: 50px;
+    }
+
+    .hero-text h1 {
+      font-size: 3.5rem;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .hero-text p {
+      color: #cbd5e1;
+      margin-bottom: 30px;
+      font-size: 1.05rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: 0.3s ease;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      background: #0ea5e9;
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    .hero-image img {
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    section {
+      padding: 90px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .section-title p {
+      color: #94a3b8;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 28px;
+      border-radius: 20px;
+      transition: 0.3s;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    }
+
+    .card h3 {
+      margin: 18px 0 10px;
+    }
+
+    .card p {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .gallery img {
+      height: 250px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.03);
+    }
+
+    .contact-box {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      padding: 50px;
+      border-radius: 24px;
+      text-align: center;
+    }
+
+    .contact-box h2 {
+      margin-bottom: 16px;
+      font-size: 2rem;
+    }
+
+    .contact-box p {
+      color: #cbd5e1;
+      margin-bottom: 24px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #94a3b8;
+    }
+
+    @media (max-width: 768px) {
+      .hero-text h1 {
+        font-size: 2.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .contact-box {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">CloudSite</div>
+
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" id="home">
+    <div class="container hero-content">
+
+      <div class="hero-text">
+        <h1>Welcome karthik 👋<br>This Is Your Website</h1>
+
+        <p>
+          A fully responsive landing page built with pure HTML and CSS.
+          Ready to upload directly to your AWS S3 bucket for static hosting.
+        </p>
+
+        <div class="btn-group">
+          <a href="#services" class="btn btn-primary">Explore</a>
+          <a href="#contact" class="btn btn-secondary">Contact Us</a>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" alt="Technology Image">
+      </div>
+
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Our Services</h2>
+        <p>Everything you need for a fast modern website.</p>
+      </div>
+
+      <div class="cards">
+
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop" alt="Web Development">
+          <h3>Web Development</h3>
+          <p>Responsive and high-performance websites built using modern technologies.</p>
+        </div>
+
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop" alt="Cloud Hosting">
+          <h3>Cloud Hosting</h3>
+          <p>Deploy scalable static websites on AWS S3 and CloudFront infrastructure.</p>
+        </div>
+
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop" alt="Security">
+          <h3>Security</h3>
+          <p>Secure deployments with HTTPS, IAM policies, and AWS best practices.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="container">
+
+      <div class="section-title">
+        <h2>Gallery</h2>
+        <p>Beautiful responsive image layout.</p>
+      </div>
+
+      <div class="gallery">
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop" alt="Office">
+        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" alt="Coding">
+        <img src="https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?q=80&w=1200&auto=format&fit=crop" alt="Laptop">
+      </div>
+
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+
+      <div class="contact-box">
+        <h2>Ready to Deploy?</h2>
+
+        <p>
+          Upload this single HTML file to your AWS S3 bucket and enable static website hosting.
+        </p>
+
+        <a href="mailto:hello@example.com" class="btn btn-primary">Get Started</a>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 CloudSite. Built for AWS S3 Static Hosting.</p>
+    </div>
+  </footer>
+
+  <script>
+    console.log('Website loaded successfully');
+
+    // Simple scroll animation effect
+    const cards = document.querySelectorAll('.card');
+
+    window.addEventListener('scroll', () => {
+      cards.forEach(card => {
+        const cardTop = card.getBoundingClientRect().top;
+
+        if(cardTop < window.innerHeight - 100) {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0px)';
+        }
+      });
+    });
+
+    cards.forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(40px)';
+      card.style.transition = 'all 0.6s ease';
+    });
+  </script>
+
+</body>
+</html>
